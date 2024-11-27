@@ -56,8 +56,6 @@ Partial Class PayrollDashboard
         emp_details_data = New DataGridView()
         emp_salary = New TabPage()
         emp_salary_data = New DataGridView()
-        emp_print = New TabPage()
-        print_salary_text = New TextBox()
         emp_detailsbtn = New Button()
         salary_detailsbtn = New Button()
         Button3 = New Button()
@@ -80,6 +78,7 @@ Partial Class PayrollDashboard
         insert_salary = New Button()
         Panel2 = New Panel()
         log_date = New DateTimePicker()
+        print_document = New Button()
         print_salary_btn = New Button()
         delete_salary = New Button()
         retrieve_salary = New Button()
@@ -106,7 +105,6 @@ Partial Class PayrollDashboard
         CType(emp_details_data, ComponentModel.ISupportInitialize).BeginInit()
         emp_salary.SuspendLayout()
         CType(emp_salary_data, ComponentModel.ISupportInitialize).BeginInit()
-        emp_print.SuspendLayout()
         Panel2.SuspendLayout()
         Panel3.SuspendLayout()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
@@ -419,7 +417,6 @@ Partial Class PayrollDashboard
         ' 
         TabControl1.Controls.Add(emp_details)
         TabControl1.Controls.Add(emp_salary)
-        TabControl1.Controls.Add(emp_print)
         TabControl1.Font = New Font("Verdana", 9F)
         TabControl1.Location = New Point(312, 387)
         TabControl1.Name = "TabControl1"
@@ -471,26 +468,6 @@ Partial Class PayrollDashboard
         emp_salary_data.ReadOnly = True
         emp_salary_data.Size = New Size(657, 327)
         emp_salary_data.TabIndex = 0
-        ' 
-        ' emp_print
-        ' 
-        emp_print.Controls.Add(print_salary_text)
-        emp_print.ForeColor = SystemColors.ControlText
-        emp_print.Location = New Point(4, 23)
-        emp_print.Name = "emp_print"
-        emp_print.Size = New Size(657, 329)
-        emp_print.TabIndex = 2
-        emp_print.Text = "PRINT PAYROLL"
-        emp_print.UseVisualStyleBackColor = True
-        ' 
-        ' print_salary_text
-        ' 
-        print_salary_text.Location = New Point(3, 3)
-        print_salary_text.Multiline = True
-        print_salary_text.Name = "print_salary_text"
-        print_salary_text.ScrollBars = ScrollBars.Vertical
-        print_salary_text.Size = New Size(651, 323)
-        print_salary_text.TabIndex = 0
         ' 
         ' emp_detailsbtn
         ' 
@@ -710,6 +687,7 @@ Partial Class PayrollDashboard
         Panel2.BackgroundImage = My.Resources.Resources.Pattern
         Panel2.BackgroundImageLayout = ImageLayout.Zoom
         Panel2.Controls.Add(log_date)
+        Panel2.Controls.Add(print_document)
         Panel2.Controls.Add(print_salary_btn)
         Panel2.Controls.Add(delete_salary)
         Panel2.Controls.Add(retrieve_salary)
@@ -751,6 +729,16 @@ Partial Class PayrollDashboard
         log_date.Size = New Size(138, 23)
         log_date.TabIndex = 8
         ' 
+        ' print_document
+        ' 
+        print_document.Font = New Font("Verdana", 5.25F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        print_document.Location = New Point(404, 347)
+        print_document.Name = "print_document"
+        print_document.Size = New Size(31, 28)
+        print_document.TabIndex = 7
+        print_document.Text = "|_|"
+        print_document.UseVisualStyleBackColor = True
+        ' 
         ' print_salary_btn
         ' 
         print_salary_btn.Font = New Font("Verdana", 9F)
@@ -758,7 +746,7 @@ Partial Class PayrollDashboard
         print_salary_btn.Name = "print_salary_btn"
         print_salary_btn.Size = New Size(87, 28)
         print_salary_btn.TabIndex = 7
-        print_salary_btn.Text = "PRINT"
+        print_salary_btn.Text = "PREVIEW"
         print_salary_btn.UseVisualStyleBackColor = True
         ' 
         ' delete_salary
@@ -937,6 +925,9 @@ Partial Class PayrollDashboard
         PrintPreviewDialog1.Name = "PrintPreviewDialog1"
         PrintPreviewDialog1.Visible = False
         ' 
+        ' PrintDocument1
+        ' 
+        ' 
         ' PayrollDashboard
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -958,8 +949,6 @@ Partial Class PayrollDashboard
         CType(emp_details_data, ComponentModel.ISupportInitialize).EndInit()
         emp_salary.ResumeLayout(False)
         CType(emp_salary_data, ComponentModel.ISupportInitialize).EndInit()
-        emp_print.ResumeLayout(False)
-        emp_print.PerformLayout()
         Panel2.ResumeLayout(False)
         Panel2.PerformLayout()
         Panel3.ResumeLayout(False)
@@ -1036,11 +1025,10 @@ Partial Class PayrollDashboard
     Friend WithEvents clear_data As Button
     Friend WithEvents log_date As DateTimePicker
     Friend WithEvents update_data As Button
-    Friend WithEvents emp_print As TabPage
-    Friend WithEvents print_salary_text As TextBox
     Friend WithEvents print_salary_btn As Button
     Friend WithEvents delete_salary As Button
     Friend WithEvents Label25 As Label
     Friend WithEvents PrintPreviewDialog1 As PrintPreviewDialog
     Friend WithEvents PrintDocument1 As Printing.PrintDocument
+    Friend WithEvents print_document As Button
 End Class

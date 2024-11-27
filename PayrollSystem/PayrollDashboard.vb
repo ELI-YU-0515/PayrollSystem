@@ -205,6 +205,7 @@ Public Class PayrollDashboard
                     If Command.ExecuteNonQuery > 0 Then
                         MessageBox.Show("Data inserted successfully!")
                         LoadData() ' Refresh the DataGridView
+                        ClearInputs() ' Clear all input controls
                     Else
                         MessageBox.Show("Insertion failed.")
                     End If
@@ -596,96 +597,217 @@ Public Class PayrollDashboard
 
 
 
-    Private selectedInternalId As Integer
+    Dim selectedInternalId As Integer
+
 
 
     Private Sub print_salary_btn_Click(sender As Object, e As EventArgs) Handles print_salary_btn.Click
-        ' Create a PrintPreviewDialog to show the print preview.
+        ' Create a PrintPreviewDialog to show the print preview
         Dim printPreviewDialog As New PrintPreviewDialog()
 
-
-        ' Set the PrintDocument for the PrintPreviewDialog.
+        ' Set the PrintDocument for the PrintPreviewDialog
         printPreviewDialog.Document = PrintDocument1
 
-        ' Fetch the internal_id from the emp_salary_details DataGridView
-        Dim selectedRow As DataGridViewRow = emp_salary_data.CurrentRow
-        Dim internalId As Integer = Convert.ToInt32(selectedRow.Cells("internal_id").Value)
+        ' Fetch the internal_id from the emp_salary_data DataGridView
+        Dim selectedRow = emp_salary_data.CurrentRow
+        Dim internalId As Integer
 
-        ' Pass the internalId to the print logic using a global variable
+        Try
+            ' Try to convert the value in the DataGridView cell to an Integer
+            internalId = Convert.ToInt32(selectedRow.Cells("internal_id").Value)
+        Catch ex As Exception
+            ' Catch any error (e.g., if the value is null or cannot be converted)
+            MessageBox.Show("Error: " & ex.Message, "Invalid Value", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return ' Optionally exit the method if there's an error
+        End Try
+
+
+        ' Pass the internalId to the print logic
         selectedInternalId = internalId
 
-        ' Show the PrintPreviewDialog
-        printPreviewDialog.StartPosition = FormStartPosition.CenterScreen
-        printPreviewDialog.Width = 800
-        printPreviewDialog.Height = 600
-        printPreviewDialog.ShowDialog()
+        ' Now call GetEmployeeDetails with the internalId parameter
+        Dim dt As DataTable = GetEmployeeDetails(internalId)
+
+        ' Check if data was returned
+        If dt.Rows.Count > 0 Then
+            ' Show the PrintPreviewDialog
+            printPreviewDialog.StartPosition = FormStartPosition.CenterScreen
+            printPreviewDialog.Width = 800
+            printPreviewDialog.Height = 600
+            printPreviewDialog.ShowDialog()
+        Else
+            MessageBox.Show("No employee details found for the selected record.")
+        End If
     End Sub
 
 
 
-    Public Class EmployeeData
-        Public Property FullName As String
-        Public Property Position As String
-        Public Property TotalIncome As Decimal
-        Public Property TotalDeductions As Decimal
-        Public Property NetPay As Decimal
-    End Class
 
+    Private Function GetEmployeeDetails(internalId As Integer) As DataTable
+        ' Connection string for MySQL
+        Dim connString As String = "server=localhost;userid=root;password='';database=payroll_systemdb"
 
-    Private Function GetEmployeeDataByInternalId(internalId As Integer) As EmployeeData
-        Dim employee As New EmployeeData()
+        ' Updated query to retrieve employee details based on internal_id
+        Dim query As String = "SELECT internal_id, ref_id, emp_full_name, emp_position, log_date, hours_worked, hourly_rate, emp_sss, emp_phic, emp_pagibig, emp_TIncome, emp_TDeduc, emp_netpay FROM vw_employee_summary WHERE internal_id = @InternalId"
 
-        ' Your SQL query
-        Dim query As String = "SELECT * FROM vw_employee_summary WHERE internal_id = @internalId"
+        ' Use MySqlConnection and MySqlCommand for MySQL database
+        Using konek As New MySqlConnection(connString)
+            Using cmd As New MySqlCommand(query, konek)
+                ' Add the parameter to the query to prevent SQL injection
+                cmd.Parameters.AddWithValue("@InternalId", internalId)
 
-        ' Assuming you're using MySQL to run the query
-        Using conn As New MySqlConnection("server=localhost;userid=root;password='';database=payroll_systemdb")
-            Using cmd As New MySqlCommand(query, conn)
-                cmd.Parameters.AddWithValue("@internalId", internalId)
-
-                conn.Open()
-                Using reader As MySqlDataReader = cmd.ExecuteReader()
-                    If reader.Read() Then
-                        ' Populate employee data from the reader
-                        employee.FullName = reader("emp_full_name").ToString()
-                        employee.Position = reader("emp_position").ToString()
-                        employee.TotalIncome = Convert.ToDecimal(reader("emp_TIncome"))
-                        employee.TotalDeductions = Convert.ToDecimal(reader("emp_TDeduc"))
-                        employee.NetPay = Convert.ToDecimal(reader("emp_netpay"))
-                    End If
-                End Using
+                Dim dt As New DataTable()
+                konek.Open()  ' Open the connection
+                dt.Load(cmd.ExecuteReader())  ' Load the data into DataTable
+                Return dt  ' Return the DataTable
             End Using
         End Using
-
-        Return employee
     End Function
 
 
 
 
+
+
+
+
+
+
+
+
+
     Private Sub printDocument1_PrintPage(sender As Object, e As Printing.PrintPageEventArgs) Handles PrintDocument1.PrintPage
-        ' Get the logo from resources
-        Using logoImage As Image = My.Resources.
+        ' Create StringBuilder instances for accumulating text
+        Dim printText As New Text.StringBuilder()
+        Dim printLINE As New Text.StringBuilder()
+        Dim printLINE2 As New Text.StringBuilder()
+        Dim SPACE As New Text.StringBuilder()
+        Dim REGULARTITLE As New Text.StringBuilder()
+        Dim REGULARDetails As New Text.StringBuilder()
 
-            ' Define positions and sizes for the logo
-            Dim logoX As Integer = 50
-            Dim logoY As Integer = 50
-            Dim logoWidth As Integer = 100
-            Dim logoHeight As Integer = 100
+        ' Load the logo image from the file path
+        Dim logoImage As Image = Image.FromFile("T:\PF101\source\respos\PayrollSystem\PayrollSystem\Resources\PAYROLL_LOGO.png")
 
-            ' Draw the logo
-            e.Graphics.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight)
+        ' Resize logo if necessary
+        Dim targetWidth As Integer = 150 ' Resize width (adjust as needed)
+        Dim targetHeight As Integer = CInt(logoImage.Height * (targetWidth / logoImage.Width)) ' Maintain aspect ratio
 
-            ' Define the title font
-            Dim titleFont As New Font("Arial", 16, FontStyle.Bold)
-            Dim titleX As Integer = logoX + logoWidth + 20 ' Position title next to logo
-            Dim titleY As Integer = logoY + (logoHeight / 4) ' Center-align title with logo
+        ' Define the starting position for the logo
+        Dim startX As Integer = 110
+        Dim startY As Integer = 50
+        Dim imageRect As New Rectangle(startX, startY, targetWidth, targetHeight)
 
-            ' Draw the title
-            e.Graphics.DrawString("ITECH COMPANY PAY-SLIP", titleFont, Brushes.Black, titleX, titleY)
-        End Using
+        ' Draw the image (logo)
+        e.Graphics.DrawImage(logoImage, imageRect)
+
+        ' Title (centered)
+        printText.AppendLine("-- ITECH COMPANY PAY-SLIP --")
+        Dim line As New Font("Arial", 20, FontStyle.Regular)
+        Dim titleFont As New Font("Arial", 22, FontStyle.Bold)
+        Dim REGULARFont As New Font("Arial", 11, FontStyle.Bold)
+        Dim REGULARDetail As New Font("Arial", 11, FontStyle.Regular)
+
+        ' Calculate position for the title (centered)
+        Dim titleWidth As Single = e.Graphics.MeasureString(printText.ToString(), titleFont).Width
+        Dim pageWidth As Integer = e.PageSettings.PrintableArea.Width
+
+        Dim rightShift As Integer = 60 ' Shift everything by 100 units to the right
+
+
+        Dim dt As DataTable = GetEmployeeDetails(selectedInternalId)
+        If dt.Rows.Count > 0 Then
+            Dim row As DataRow = dt.Rows(0)
+
+            printLINE.AppendLine("________________________________________")
+            printLINE2.AppendLine("___________")
+            SPACE.AppendLine()
+            SPACE.AppendLine()
+            REGULARTITLE.AppendLine("EMPLOYEE DETAILS")
+
+            REGULARTITLE.AppendLine()
+            REGULARTITLE.AppendLine()
+            REGULARTITLE.AppendLine()
+            REGULARTITLE.AppendLine()
+            REGULARTITLE.AppendLine()
+            REGULARTITLE.AppendLine()
+            REGULARTITLE.AppendLine()
+            REGULARTITLE.AppendLine("SALARY DETAILS")
+            REGULARDetails.AppendLine("NAME:  " & row("emp_full_name") & vbTab & vbTab & vbTab & vbTab & "DATE: " & row("log_date"))
+            REGULARDetails.AppendLine("EMPLOYEE POSITION:  " & row("emp_position"))
+            REGULARDetails.AppendLine("EMPLOYEE ID:  " & row("ref_id"))
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine("HOURLY RATE:  " & "₱ " & row("hourly_rate") & vbTab & vbTab & vbTab & vbTab & "SSS:  " & "₱ " & row("emp_sss"))
+            REGULARDetails.AppendLine("HOURS WORKED:  " & row("hours_worked") & vbTab & vbTab & vbTab & vbTab & vbTab & "PHIC:  " & "₱ " & row("emp_phic"))
+            REGULARDetails.AppendLine("GROSS INCOME:  " & "₱ " & row("emp_TIncome") & vbTab & vbTab & vbTab & vbTab & "PAGIBIG:  " & "₱ " & row("emp_pagibig"))
+            REGULARDetails.AppendLine(vbTab & vbTab & vbTab & vbTab & vbTab & vbTab & vbTab & "DEDUCTIONS:  " & "₱ " & row("emp_TDeduc"))
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine(vbTab & vbTab & vbTab & vbTab & vbTab & vbTab & vbTab & "NET INCOME:  " & "₱ " & row("emp_netpay"))
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine("RECEIVED BY:")
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine(vbTab & vbTab & row("emp_full_name"))
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine()
+            REGULARDetails.AppendLine(vbTab & vbTab & "       NEED HELP? CONTACT US @: 0999-888-7777")
+        End If
+
+
+        ' Render the title text centered
+        e.Graphics.DrawString(printText.ToString(), titleFont, Brushes.Black, 250, 115)
+        e.Graphics.DrawString(printLINE.ToString(), line, Brushes.Black, 50 + rightShift, 130)
+        e.Graphics.DrawString(REGULARTITLE.ToString(), REGULARFont, Brushes.Black, 320 + rightShift, 180)
+
+        ' Render the "EMPLOYEE DETAILS" title (centered on the page)
+
+        ' Render the employee details (NAME, DATE, EMPLOYEE POSITION, EMPLOYEE ID)
+        e.Graphics.DrawString(REGULARDetails.ToString(), REGULARDetail, Brushes.Black, 60 + rightShift, 220)
+        e.Graphics.DrawString(printLINE.ToString(), line, Brushes.Black, 50 + rightShift, 270)
+        e.Graphics.DrawString(printLINE.ToString(), line, Brushes.Black, 50 + rightShift, 500)
+        e.Graphics.DrawString(printLINE2.ToString(), line, Brushes.Black, 170 + rightShift, 575)
+        e.Graphics.DrawString(printLINE.ToString(), line, Brushes.Black, 50 + rightShift, 690)
+        e.Graphics.DrawString(printLINE.ToString(), line, Brushes.Black, 50 + rightShift, 725)
+
+        ' Optional: Add other employee details or content below the title here
     End Sub
 
 
+
+    Private Sub print_document_Click(sender As Object, e As EventArgs) Handles print_document.Click
+        ' Get the employee details (assuming they are retrieved from a DataTable)
+        Dim dt As DataTable = GetEmployeeDetails(selectedInternalId)
+        If dt.Rows.Count > 0 Then
+            Dim row As DataRow = dt.Rows(0)
+
+            ' Get employee full name and log date
+            Dim empFullName As String = row("emp_full_name").ToString()
+            Dim logDate As DateTime = Convert.ToDateTime(row("log_date"))
+
+            ' Format the log date to a string (e.g., "MM-dd-yyyy")
+            Dim formattedDate As String = logDate.ToString("MM-dd-yyyy")
+
+            ' Generate the filename based on the employee full name and log date
+            Dim defaultFileName As String = $"{empFullName} PAYSLIP {formattedDate}.pdf"
+            PrintDocument1.Print()
+            MessageBox.Show("Pay slip has been saved successfully as PDF.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+
+
+            ' Show the SaveFileDialog and check if the user selected a file location
+
+        End If
+    End Sub
 
 End Class
