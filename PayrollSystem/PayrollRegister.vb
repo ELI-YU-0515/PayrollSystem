@@ -6,6 +6,7 @@ Imports System.Windows.Forms.VisualStyles
 
 
 Imports MySql.Data.MySqlClient
+Imports Org.BouncyCastle.Ocsp
 
 
 
@@ -25,21 +26,6 @@ Public Class PayrollRegister
 
     Dim konek As MySqlConnection
     Dim COMMAND As MySqlCommand
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        konek = New MySqlConnection
-        konek.ConnectionString = "server=localhost;userid=root;password='';database=payroll_systemdb"
-
-        Try
-            konek.Open()
-            MessageBox.Show("Connection to MySQL test database was successful!!!!", "TESTING      CONNECTION TO MySQL DATABASE")
-            konek.Close()
-        Catch ex As Exception
-            MsgBox(ex.Message)
-            konek.Close()
-        End Try
-    End Sub
-
-
 
 
     Private Sub PayrollRegister_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -90,7 +76,7 @@ Public Class PayrollRegister
             Else
                 MessageBox.Show("Insertion failed.")
             End If
-
+            ClearInputs()
             konek.Close()
         Catch ex As MySqlException
             MessageBox.Show("Error: " & ex.Message)
@@ -99,6 +85,7 @@ Public Class PayrollRegister
                 konek.Close()
             End If
         End Try
+
     End Sub
 
 
@@ -112,12 +99,6 @@ Public Class PayrollRegister
         End If
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles register_btn.Click
-
-    End Sub
-
-
-
 
     Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel1.LinkClicked
         ' Hide the register form and show the login form
@@ -125,11 +106,17 @@ Public Class PayrollRegister
         PayrollLogin.Show()
     End Sub
 
-    Private Sub Panel1_Paint(sender As Object, e As PaintEventArgs) Handles Panel1.Paint
 
+
+    Private Sub ClearInputs()
+        ' Clear all textboxes
+        FName.Clear()
+        LName.Clear()
+        user_name.Clear()
+        PSTextbox1.Clear()
+        PSTextbox2.Clear()
+        user_type.Clear()
     End Sub
 
-    Private Sub Fname_TextChanged(sender As Object, e As EventArgs) Handles LName.TextChanged
 
-    End Sub
 End Class

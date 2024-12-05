@@ -338,7 +338,7 @@ Public Class PayrollDashboard
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        Me.Close()
+        Me.Hide()
         PayrollLogin.Show()
     End Sub
 
@@ -788,6 +788,7 @@ Public Class PayrollDashboard
     Private Sub print_document_Click(sender As Object, e As EventArgs) Handles print_document.Click
         ' Get the employee details (assuming they are retrieved from a DataTable)
         Dim dt As DataTable = GetEmployeeDetails(selectedInternalId)
+
         If dt.Rows.Count > 0 Then
             Dim row As DataRow = dt.Rows(0)
 
@@ -800,13 +801,55 @@ Public Class PayrollDashboard
 
             ' Generate the filename based on the employee full name and log date
             Dim defaultFileName As String = $"{empFullName} PAYSLIP {formattedDate}.pdf"
-            PrintDocument1.Print()
-            MessageBox.Show("Pay slip has been saved successfully as PDF.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
+            ' Create a SaveFileDialog to choose the file location
+            Using saveFileDialog As New SaveFileDialog()
+                ' Define your default save directory
+                Dim defaultPath1 As String = "T:\PF101\source\respos\PayrollSystem\PayrollSystem\PRINT"
+                Dim defaultPath2 As String = "C:\documents\source\respos\PayrollSystem\PayrollSystem\PRINT"
 
+                ' Check which path exists and use it as the default directory
+                If IO.Directory.Exists(defaultPath1) Then
+                    saveFileDialog.InitialDirectory = defaultPath1
+                ElseIf IO.Directory.Exists(defaultPath2) Then
+                    saveFileDialog.InitialDirectory = defaultPath2
+                Else
+                    ' Default to the user's Documents folder if neither exists
+                    saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                End If
 
-            ' Show the SaveFileDialog and check if the user selected a file location
+                ' Set default filename and filter for PDF files
+                saveFileDialog.FileName = defaultFileName
+                saveFileDialog.Filter = "PDF files (*.pdf)|*.pdf|All files (*.*)|*.*"
 
+                ' Show the SaveFileDialog
+                If saveFileDialog.ShowDialog() = DialogResult.OK Then
+                    ' Proceed with saving the file
+                    Dim filePath As String = saveFileDialog.FileName
+
+                    ' Configure PrintDocument1 to use Microsoft Print to PDF
+                    PrintDocument1.PrinterSettings.PrinterName = "Microsoft Print to PDF"
+                    PrintDocument1.PrinterSettings.PrintToFile = True
+                    PrintDocument1.PrinterSettings.PrintFileName = filePath
+
+                    ' Print the document
+                    PrintDocument1.Print()
+
+                    ' Show a success message only if a file was selected
+                    MessageBox.Show("Pay slip has been saved successfully as PDF.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                End If
+            End Using
+
+        Else
+            ' Handle the case where no employee details are found
+            MessageBox.Show("No employee details found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
+    End Sub
+
+    Private Sub MAINUI_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        ' Check if the close action was initiated by the user (e.g., closing the window)
+        If e.CloseReason = CloseReason.UserClosing Then
+            Application.Exit()  ' Exit the application
         End If
     End Sub
 

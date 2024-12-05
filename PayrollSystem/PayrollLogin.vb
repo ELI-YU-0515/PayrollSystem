@@ -1,4 +1,5 @@
 ﻿Imports MySql.Data.MySqlClient
+Imports Org.BouncyCastle.Ocsp
 Imports System.Drawing.Drawing2D
 Imports System.Security.Cryptography
 Imports System.Text
@@ -44,6 +45,8 @@ Public Class PayrollLogin
         Return DGP
     End Function
 
+
+
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         Dim username As String = TextBox1.Text
         Dim password As String = TextBox2.Text
@@ -56,6 +59,11 @@ Public Class PayrollLogin
         cmd.Parameters.AddWithValue("@username", username)
         cmd.Parameters.AddWithValue("@password", password) ' Plain text password comparison
 
+        If String.IsNullOrEmpty(TextBox1.Text) OrElse String.IsNullOrEmpty(TextBox2.Text) Then
+            MessageBox.Show("Please fill in all fields.")
+            Return
+        End If
+
         Try
             konek.Open()
             Dim reader As MySqlDataReader = cmd.ExecuteReader()
@@ -64,6 +72,9 @@ Public Class PayrollLogin
                 ' If username and password match, show the dashboard
                 PayrollDashboard.Show()
                 Me.Hide() ' Optionally hide the login form
+                TextBox1.Text = ""
+                TextBox2.Text = ""
+
             Else
                 MessageBox.Show("Invalid username or password.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End If

@@ -48,7 +48,6 @@ Partial Class PayrollRegister
         Panel2 = New Panel()
         LName = New TextBox()
         PictureBox1 = New PictureBox()
-        Button2 = New Button()
         Panel1.SuspendLayout()
         Panel6.SuspendLayout()
         Panel5.SuspendLayout()
@@ -204,6 +203,7 @@ Partial Class PayrollRegister
         PSTextbox2.Location = New Point(-1, 0)
         PSTextbox2.Multiline = True
         PSTextbox2.Name = "PSTextbox2"
+        PSTextbox2.PasswordChar = "*"c
         PSTextbox2.Size = New Size(254, 29)
         PSTextbox2.TabIndex = 15
         ' 
@@ -265,6 +265,7 @@ Partial Class PayrollRegister
         PSTextbox1.Location = New Point(-1, 0)
         PSTextbox1.Multiline = True
         PSTextbox1.Name = "PSTextbox1"
+        PSTextbox1.PasswordChar = "*"c
         PSTextbox1.Size = New Size(254, 29)
         PSTextbox1.TabIndex = 14
         ' 
@@ -305,23 +306,12 @@ Partial Class PayrollRegister
         PictureBox1.TabIndex = 2
         PictureBox1.TabStop = False
         ' 
-        ' Button2
-        ' 
-        Button2.Font = New Font("Verdana", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Button2.Location = New Point(88, 19)
-        Button2.Name = "Button2"
-        Button2.Size = New Size(253, 36)
-        Button2.TabIndex = 20
-        Button2.Text = "REGISTER"
-        Button2.UseVisualStyleBackColor = True
-        ' 
         ' PayrollRegister
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(800, 450)
         ControlBox = False
-        Controls.Add(Button2)
         Controls.Add(Panel1)
         Controls.Add(PictureBox1)
         FormBorderStyle = FormBorderStyle.None
@@ -364,7 +354,6 @@ Partial Class PayrollRegister
     Friend WithEvents Label5 As Label
     Friend WithEvents Label4 As Label
     Friend WithEvents CheckBox1 As CheckBox
-    Friend WithEvents Button2 As Button
     Friend WithEvents RichTextBox1 As RichTextBox
     Friend WithEvents Label8 As Label
     Friend WithEvents Panel8 As Panel

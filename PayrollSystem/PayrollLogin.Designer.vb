@@ -33,6 +33,8 @@ Partial Class PayrollLogin
         Label1 = New Label()
         Panel2 = New Panel()
         TextBox2 = New TextBox()
+        Label3 = New Label()
+        Label4 = New Label()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         Panel1.SuspendLayout()
         Panel3.SuspendLayout()
@@ -51,6 +53,8 @@ Partial Class PayrollLogin
         ' 
         ' Panel1
         ' 
+        Panel1.Controls.Add(Label4)
+        Panel1.Controls.Add(Label3)
         Panel1.Controls.Add(Label2)
         Panel1.Controls.Add(LinkLabel1)
         Panel1.Controls.Add(Button1)
@@ -125,7 +129,7 @@ Partial Class PayrollLogin
         ' 
         Panel2.BackColor = SystemColors.ButtonShadow
         Panel2.Controls.Add(TextBox2)
-        Panel2.Location = New Point(79, 192)
+        Panel2.Location = New Point(79, 208)
         Panel2.Name = "Panel2"
         Panel2.Size = New Size(253, 29)
         Panel2.TabIndex = 15
@@ -138,6 +142,26 @@ Partial Class PayrollLogin
         TextBox2.PasswordChar = "*"c
         TextBox2.Size = New Size(253, 29)
         TextBox2.TabIndex = 2
+        ' 
+        ' Label3
+        ' 
+        Label3.AutoSize = True
+        Label3.Font = New Font("Verdana", 9F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label3.Location = New Point(79, 134)
+        Label3.Name = "Label3"
+        Label3.Size = New Size(71, 14)
+        Label3.TabIndex = 19
+        Label3.Text = "Username"
+        ' 
+        ' Label4
+        ' 
+        Label4.AutoSize = True
+        Label4.Font = New Font("Verdana", 9F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label4.Location = New Point(79, 189)
+        Label4.Name = "Label4"
+        Label4.Size = New Size(69, 14)
+        Label4.TabIndex = 20
+        Label4.Text = "Password"
         ' 
         ' PayrollLogin
         ' 
@@ -173,5 +197,7 @@ Partial Class PayrollLogin
     Friend WithEvents TextBox1 As TextBox
     Friend WithEvents TextBox2 As TextBox
     Friend WithEvents Label2 As Label
+    Friend WithEvents Label4 As Label
+    Friend WithEvents Label3 As Label
 
 End Class
